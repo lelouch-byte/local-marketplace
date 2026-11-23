@@ -2,11 +2,13 @@ from sqlalchemy.orm import Session
 from app.models.category import Category  # Импортируйте вашу модель Category
 
 DEFAULT_CATEGORIES = [
-    {"name": "Еда и напитки", "slug": "food-and-drinks"},
-    {"name": "Транспорт", "slug": "transport"},
-    {"name": "Жилье", "slug": "housing"},
-    {"name": "Развлечения", "slug": "entertainment"},
-    {"name": "Здоровье", "slug": "health"},
+    {"name": "Бытовая электроника", "slug": "consumer-electronic"},
+    {"name": "Смарт-устройства", "slug": "computers"},
+    {"name": "Учебные пособия", "slug": "study-guides"},
+    {"name": "Канцелярия", "slug": "chancellery"},
+    {"name": "Литература", "slug": "literature"},
+    {"name": "Посуда", "slug": "dishes"},
+    {"name": "Одежда", "slug": "clothes"}
 ]
 
 
