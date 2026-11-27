@@ -1,3 +1,4 @@
+// Тестовые данные
 const adsData = [
     { id: 1, title: "Конспекты по матанализу (1 семестр)", price: 500, category: "study", status: "used", statusText: "Б/У" },
     { id: 2, title: "Микроволновка в общагу", price: 1500, category: "dorm", status: "used", statusText: "Б/У" },
@@ -13,6 +14,7 @@ const grid = document.getElementById('adsGrid');
 const searchInput = document.getElementById('searchInput');
 const categoryFilter = document.getElementById('categoryFilter');
 
+// --- ОТРИСОВКА КАРТОЧЕК ---
 function renderAds(ads) {
     grid.innerHTML = ''; 
     if (ads.length === 0) {
@@ -49,6 +51,7 @@ function getCategoryName(cat) {
     return map[cat] || cat;
 }
 
+// --- ФИЛЬТРАЦИЯ ---
 function filterAds() {
     const query = searchInput.value.toLowerCase();
     const category = categoryFilter.value;
@@ -62,4 +65,41 @@ function filterAds() {
 
 searchInput.addEventListener('input', filterAds);
 categoryFilter.addEventListener('change', filterAds);
+
+// --- ЛОГИКА ДЛЯ ФОРМЫ (Задача #7) ---
+const createAdForm = document.getElementById('createAdForm');
+const formError = document.getElementById('formError');
+const createAdModalElement = document.getElementById('createAdModal');
+const createAdModal = new bootstrap.Modal(createAdModalElement);
+
+createAdForm.addEventListener('submit', function (event) {
+    event.preventDefault(); // Останавливаем перезагрузку страницы
+    event.stopPropagation();
+
+    // Проверяем валидацию
+    if (!createAdForm.checkValidity()) {
+        createAdForm.classList.add('was-validated');
+        return;
+    }
+
+    // Собираем данные (пока в консоль)
+    const formData = {
+        title: document.getElementById('adTitle').value,
+        category: document.getElementById('adCategory').value,
+        dealType: document.getElementById('adDealType').value,
+        price: document.getElementById('adPrice').value,
+        vkLink: document.getElementById('adVk').value,
+        description: document.getElementById('adDescription').value
+    };
+
+    console.log('Данные нового объявления:', formData);
+
+    // Успешная отправка (закрываем окно, очищаем форму)
+    createAdModal.hide();
+    createAdForm.reset();
+    createAdForm.classList.remove('was-validated');
+    formError.classList.add('d-none');
+});
+
+// Первичная отрисовка
 renderAds(adsData);
