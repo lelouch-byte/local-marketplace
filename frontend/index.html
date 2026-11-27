@@ -4,34 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Барахолка ТПУ</title>
-    <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Иконки Bootstrap -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <!-- Наши стили -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-light">
 
-    <!-- 1. НАВИГАЦИОННАЯ ПАНЕЛЬ -->
+    <!-- НАВИГАЦИЯ -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-2" href="#">
                 <i class="bi bi-shop"></i> Барахолка ТПУ
-                <span class="badge bg-secondary fs-6 fw-normal d-none d-md-inline">Студентам и сотрудникам</span>
             </a>
-            <!-- ВАЖНО: здесь изменен target на createAdModal -->
             <button class="btn btn-primary d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#createAdModal">
                 <i class="bi bi-plus-lg"></i> Подать объявление
             </button>
         </div>
     </nav>
 
-    <!-- 2. ПАНЕЛЬ ФИЛЬТРОВ -->
+    <!-- ФИЛЬТРЫ -->
     <div class="container my-4">
         <div class="row g-3 bg-white p-3 rounded shadow-sm">
             <div class="col-12 col-md-8">
-                <input type="text" id="searchInput" class="form-control" placeholder="Что ищем? (конспект, микроволновка, халат...)">
+                <input type="text" id="searchInput" class="form-control" placeholder="Что ищем?">
             </div>
             <div class="col-12 col-md-4">
                 <select id="categoryFilter" class="form-select">
@@ -45,42 +40,72 @@
         </div>
     </div>
 
-    <!-- 3. СЕТКА КАРТОЧЕК -->
+    <!-- СЕТКА КАРТОЧЕК -->
     <div class="container pb-5">
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4" id="adsGrid">
-            <!-- Карточки появятся здесь -->
+            <!-- Карточки рендерятся через JS -->
         </div>
     </div>
 
-    <!-- 4. МОДАЛЬНОЕ ОКНО СОЗДАНИЯ ОБЪЯВЛЕНИЯ (Задача #7) -->
-    <div class="modal fade" id="createAdModal" tabindex="-1" aria-labelledby="createAdModalLabel" aria-hidden="true">
+    <!-- МОДАЛЬНОЕ ОКНО: ДЕТАЛЬНЫЙ ПРОСМОТР (Задача #8) -->
+    <div class="modal fade" id="adDetailModal" tabindex="-1" aria-hidden="true">
       <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="createAdModalLabel">Новое объявление</h5>
+            <h5 class="modal-title" id="detailTitle">Загрузка...</h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
           </div>
           <div class="modal-body">
+            <!-- Картинка -->
+            <img id="detailImage" src="" class="img-fluid rounded mb-3 w-100" style="max-height: 400px; object-fit: cover;" alt="Фото товара">
             
-            <!-- Контейнер для ошибок отправки (скрыт по умолчанию) -->
-            <div id="formError" class="alert alert-danger d-none" role="alert">
-              Ошибка отправки. Попробуйте позже.
+            <!-- Бейджи -->
+            <div class="d-flex gap-2 mb-2">
+                <span id="detailDealBadge" class="badge bg-primary">Тип сделки</span>
+                <span id="detailCategoryBadge" class="badge bg-secondary">Категория</span>
             </div>
+            
+            <!-- Цена и дата -->
+            <h3 id="detailPrice" class="text-primary fw-bold">0 ₽</h3>
+            <p class="text-muted small mb-3" id="detailDate">Дата публикации</p>
+            
+            <hr>
+            
+            <!-- Полное описание -->
+            <h6>Описание:</h6>
+            <p id="detailDescription" style="white-space: pre-wrap;">...</p>
+          </div>
+          <div class="modal-footer">
+            <!-- Кнопка связи ВК -->
+            <a href="#" id="detailVkLink" target="_blank" class="btn btn-primary w-100 py-2">
+                <i class="bi bi-chat-dots"></i> Связаться с продавцом (ВК)
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
 
-            <!-- Форма (novalidate отключает дефолтные браузерные тултипы) -->
+    <!-- МОДАЛЬНОЕ ОКНО: ФОРМА СОЗДАНИЯ (Задача #7) -->
+    <div class="modal fade" id="createAdModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Новое объявление</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div id="formError" class="alert alert-danger d-none">Ошибка отправки.</div>
             <form id="createAdForm" class="needs-validation" novalidate>
               <div class="row g-3">
-                
                 <div class="col-12">
-                  <label for="adTitle" class="form-label">Название <span class="text-danger">*</span></label>
-                  <input type="text" class="form-control" id="adTitle" required minlength="3" placeholder="Например: Микроволновка">
-                  <div class="invalid-feedback">Введите название (минимум 3 символа).</div>
+                  <label class="form-label">Название *</label>
+                  <input type="text" class="form-control" id="adTitle" required minlength="3">
+                  <div class="invalid-feedback">Минимум 3 символа.</div>
                 </div>
-
                 <div class="col-md-6">
-                  <label for="adCategory" class="form-label">Категория <span class="text-danger">*</span></label>
+                  <label class="form-label">Категория *</label>
                   <select class="form-select" id="adCategory" required>
-                    <option value="" selected disabled>Выберите категорию...</option>
+                    <option value="" selected disabled>Выберите...</option>
                     <option value="study">Учеба и книги</option>
                     <option value="tech">Техника и гаджеты</option>
                     <option value="dorm">Для общаги и дома</option>
@@ -88,53 +113,43 @@
                   </select>
                   <div class="invalid-feedback">Выберите категорию.</div>
                 </div>
-
                 <div class="col-md-6">
-                  <label for="adDealType" class="form-label">Тип сделки <span class="text-danger">*</span></label>
+                  <label class="form-label">Тип сделки *</label>
                   <select class="form-select" id="adDealType" required>
-                    <option value="" selected disabled>Выберите тип...</option>
+                    <option value="" selected disabled>Выберите...</option>
                     <option value="sale">Продажа</option>
                     <option value="free">Отдам бесплатно</option>
                     <option value="exchange">Обмен</option>
                   </select>
-                  <div class="invalid-feedback">Выберите тип сделки.</div>
+                  <div class="invalid-feedback">Выберите тип.</div>
                 </div>
-
                 <div class="col-md-6">
-                  <label for="adPrice" class="form-label">Цена (₽) <span class="text-danger">*</span></label>
-                  <input type="number" class="form-control" id="adPrice" required min="0" placeholder="0">
-                  <div class="invalid-feedback">Укажите цену (0 или больше).</div>
+                  <label class="form-label">Цена (₽) *</label>
+                  <input type="number" class="form-control" id="adPrice" required min="0">
+                  <div class="invalid-feedback">Укажите цену.</div>
                 </div>
-
-                <!-- Изменили Telegram на ВК -->
                 <div class="col-md-6">
-                  <label for="adVk" class="form-label">Ссылка на профиль ВК <span class="text-danger">*</span></label>
+                  <label class="form-label">Ссылка на ВК *</label>
                   <input type="url" class="form-control" id="adVk" required placeholder="https://vk.com/username">
-                  <div class="invalid-feedback">Укажите ссылку на ваш профиль ВК (начиная с https://).</div>
+                  <div class="invalid-feedback">Укажите ссылку.</div>
                 </div>
-
                 <div class="col-12">
-                  <label for="adDescription" class="form-label">Описание <span class="text-danger">*</span></label>
-                  <textarea class="form-control" id="adDescription" rows="3" required placeholder="Расскажите о состоянии товара..."></textarea>
-                  <div class="invalid-feedback">Добавьте описание товара.</div>
+                  <label class="form-label">Описание *</label>
+                  <textarea class="form-control" id="adDescription" rows="3" required></textarea>
+                  <div class="invalid-feedback">Добавьте описание.</div>
                 </div>
-
               </div>
             </form>
           </div>
-          
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-            <!-- Кнопка Опубликовать привязана к форме через form="createAdForm" -->
             <button type="submit" form="createAdForm" class="btn btn-primary">Опубликовать</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Наш JS -->
     <script src="script.js"></script>
 </body>
 </html>
