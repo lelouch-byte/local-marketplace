@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Барахолка ТПУ</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-light">
+
+    <!-- НАВИГАЦИЯ -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+                <i class="bi bi-shop"></i> Барахолка ТПУ
+            </a>
+            <button class="btn btn-primary d-flex align-items-center gap-2" data-bs-toggle="modal" data-bs-target="#createAdModal">
+                <i class="bi bi-plus-lg"></i> Подать объявление
+            </button>
+        </div>
+    </nav>
+
+    <!-- ФИЛЬТРЫ -->
+    <div class="container my-4">
+        <div class="row g-3 bg-white p-3 rounded shadow-sm">
+            <div class="col-12 col-md-8">
+                <input type="text" id="searchInput" class="form-control" placeholder="Что ищем?">
+            </div>
+            <div class="col-12 col-md-4">
+                <select id="categoryFilter" class="form-select">
+                    <option value="all">Все категории</option>
+                    <option value="study">Учеба и книги</option>
+                    <option value="tech">Техника и гаджеты</option>
+                    <option value="dorm">Для общаги и дома</option>
+                    <option value="clothes">Одежда и мерч</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- СЕТКА КАРТОЧЕК -->
+    <div class="container pb-5">
+        <!-- Спиннер загрузки -->
+        <div id="loadingSpinner" class="text-center my-5 d-none">
+            <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+                <span class="visually-hidden">Загрузка...</span>
+            </div>
+            <p class="mt-2 text-muted">Загружаем объявления...</p>
+        </div>
+
+        <!-- Сообщение об ошибке сети -->
+        <div id="networkError" class="alert alert-danger d-none text-center" role="alert">
+            <i class="bi bi-exclamation-triangle"></i> Не удалось загрузить объявления. Проверьте соединение с интернетом.
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4" id="adsGrid">
+            <!-- Карточки рендерятся через JS -->
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО: ДЕТАЛЬНЫЙ ПРОСМОТР -->
+    <div class="modal fade" id="adDetailModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="detailTitle">Загрузка...</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+          </div>
+          <div class="modal-body">
+            <img id="detailImage" src="" class="img-fluid rounded mb-3 w-100" style="max-height: 400px; object-fit: cover;" alt="Фото товара">
+            <div class="d-flex gap-2 mb-2">
+                <span id="detailDealBadge" class="badge bg-primary">Тип сделки</span>
+                <span id="detailCategoryBadge" class="badge bg-secondary">Категория</span>
+            </div>
+            <h3 id="detailPrice" class="text-primary fw-bold">0 ₽</h3>
+            <p class="text-muted small mb-3" id="detailDate">Дата публикации</p>
+            <hr>
+            <h6>Описание:</h6>
+            <p id="detailDescription" style="white-space: pre-wrap;">...</p>
+          </div>
+          <div class="modal-footer">
+            <a href="#" id="detailVkLink" target="_blank" class="btn btn-primary w-100 py-2">
+                <i class="bi bi-chat-dots"></i> Связаться с продавцом (ВК)
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО: ФОРМА СОЗДАНИЯ -->
+    <div class="modal fade" id="createAdModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Новое объявление</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div id="formError" class="alert alert-danger d-none">Ошибка отправки.</div>
+            <form id="createAdForm" class="needs-validation" novalidate>
+              <div class="row g-3">
+                <div class="col-12">
+                  <label class="form-label">Название *</label>
+                  <input type="text" class="form-control" id="adTitle" required minlength="3">
+                  <div class="invalid-feedback">Минимум 3 символа.</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Категория *</label>
+                  <select class="form-select" id="adCategory" required>
+                    <option value="" selected disabled>Выберите...</option>
+                    <option value="study">Учеба и книги</option>
+                    <option value="tech">Техника и гаджеты</option>
+                    <option value="dorm">Для общаги и дома</option>
+                    <option value="clothes">Одежда и мерч</option>
+                  </select>
+                  <div class="invalid-feedback">Выберите категорию.</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Тип сделки *</label>
+                  <select class="form-select" id="adDealType" required>
+                    <option value="" selected disabled>Выберите...</option>
+                    <option value="sale">Продажа</option>
+                    <option value="free">Отдам бесплатно</option>
+                    <option value="exchange">Обмен</option>
+                  </select>
+                  <div class="invalid-feedback">Выберите тип.</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Цена (₽) *</label>
+                  <input type="number" class="form-control" id="adPrice" required min="0">
+                  <div class="invalid-feedback">Укажите цену.</div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Ссылка на ВК *</label>
+                  <input type="url" class="form-control" id="adVk" required placeholder="https://vk.com/username">
+                  <div class="invalid-feedback">Укажите ссылку.</div>
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Описание *</label>
+                  <textarea class="form-control" id="adDescription" rows="3" required></textarea>
+                  <div class="invalid-feedback">Добавьте описание.</div>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+            <button type="submit" form="createAdForm" class="btn btn-primary">Опубликовать</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Обрати внимание на новый путь! -->
+    <script src="js/app.js"></script>
+</body>
+</html>
